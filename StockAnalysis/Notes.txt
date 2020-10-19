@@ -1,0 +1,78 @@
+We are using tensorflow 1.15 and keras 2.3.
+
+About the Data:
+This Data is all About Forecasting NIFTY50 Stock Price.
+
+Important Points:
+-> Stock Market Doesn't Trade on Weekends.
+-> Stationarity - Property of Time Series Data which states that there is no trend in the data, i.e, Mean and Standard Deviation of data series has not changed across time.
+-> Importance of Stationarity - For Forecasting, its important that the data be stationary because in the absence of it, one is asking to predict for a model that is nothing like it has seen before.
+-> Test for Stationarity - Dickey-Fuller Test, if p value associated with DF test is greater than 0.5, data is not stationary.
+-> What to do when data is not stationary? 
+    - For level Variables, the first difference is the percentage change from previous time period.
+    - For percentage variables, its the value of current time period subtracted from previous data.
+    
+Time Series is sequential data form, i.e, the data today is highly dependent on the data yesterday.
+
+Lags in the data:
+In simple words, if I am going to predict the returns for 2 days later, my lag will be 2.
+Lags are needed in the data because for prediction.
+
+We use the concept of Auto Correlation that means - What is the correlation between value today and yesterday(direct correlation).
+Partial Correlation - After I've found the auto-correlation between the data, we find the residual correlation in the data. 
+
+ACF and PACF Lag structure gives us the number of lags that can be considered for forecasting.
+
+The objective of ML methods is to predict the dependent variable as accurately as possible.
+
+Types of Data Splits:
+    - Crossvalidation -> not suited for time series
+    - fixed window (training, validation and testing periods demarcated by dates)
+    - rolling window (shifting a window of fixed size ahead by one observation successively)
+    - expanding window (increasing the window size by 1 successively)
+    
+Normalization of Data:
+- ML methods are not scale invariant.
+- Normalizing on training data to avoid data leakage.
+- Using sklearn is useful.
+
+Rescaling Normalized Data:
+- scaling data between -1 and 1 as that is appropriate for being input into CNNs and LSTMs.
+
+Why not OLS for Time Series Data?
+- OLS does not care of order of data and also needs the error term to not be correlated(AutoCorrelation)
+- No multicollinearity
+- May not be stationary (HeteroScedastic)
+
+SARIMA?
+-> ARIMA models (Auto Regressive Integrated Moving Averages) describe how successive observation is related to previous observation.
+-> SARIMA models incorporates seasonal components in a univariate time series in addition to autoregressive, moving averages and trend components typically modelled by ARIMA.
+
+Why SARIMAX is an issue?
+Well SARIMAX only basically depends on the y_value and does not really consider x values in to account. This does not help capture the sequentiality of data properly. Moreover, this is a linear method like OLS. Quality of the forecast declines as we go much into the future because it becomes forecast of the forecasted data. Hence, it makes the quality go low. (Probably Constant)
+
+For Non Linearity in data and capturing entire sequentiality of data -> Neural Network Comes to the rescue.
+
+We cannot use a regular Deep NN as it only depends on the previous data(yesterday for today). Whereas in 1D CNN or LSTM models, the data from long past is kept in memory, so that it can be used to predict the value.
+
+If we take the dependency for last n days, the first n days are not predicted and the next n+1th observation is the dependency of previous n inputs. Hence, it is sequential network, in the sense, it absorbs the data not just from yesterday but a sequence of previous days. (This means to preserve the temporal structure of data).
+
+We prepare the data in such a way that we leave the first n_steps_in observations and go on till n_steps_in+n_steps_out-1. This will definately maintain the temporal fashion of our data.
+
+How CNNs work in time-series?
+- It preserves the temporal structure of the data.
+- It applies filters to create feature maps -> the one which tries to find correlation of data across time. Each Filter creates a new independent feature.
+- Each additional feature results in a new feature map extracting a more complex feature.
+- For timeseries, a filter can only move in 1 direction/dimension i.e, time.
+-> CNN layer can be followed by a sub-sampling layer that reduces the noise in the learned features(i.e, feature maps)
+-> The sub-sampling layer is followed by a regression layer.
+
+The key shortcomings of CNNs for timeseries is that they do not draw info from the sequential nature of indep. data.
+
+LSTMs (Long Short Term Memory Networks):
+-> LSTMs draws info from the sequential nature of indep. data.
+-> LSTMs belongs to larger class of neural nets known as RNNs, all of which have memory component.
+
+LSTMs build short and long term memories by revealing data to the hidden nodes in a sequential fashion.
+
+To keep it Simple --- CNNs just go in sequential order in one go, without retention of any pattern that it observes, whereas RNNs keep Sequential along with memory of the data observed.
